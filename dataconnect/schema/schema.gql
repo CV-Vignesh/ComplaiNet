@@ -1,0 +1,36 @@
+type Complaint @table {
+  id: UUID! @default(expr: "uuidV4()")
+  
+  # 1. ORIGIN & CUSTOMER DETAILS
+  complaintSource: String
+  customerName: String
+  
+  # 2. PRODUCT & BATCH IDENTIFICATION
+  productName: String
+  productStrengthGrade: String
+  batchLotNumber: String
+  manufacturingDate: Date
+  expiryDate: Date
+  quantityAffected: String # Stored as string to handle "50 kg" or "48 capsules" seamlessly
+  
+  # 3. COMPLAINT DETAILS
+  complaintType: String
+  complaintDate: Date
+  detailedComplaintDescription: String
+  
+  # 4. INITIAL ASSESSMENT & PRIORITY
+  initialSeverity: String
+  priority: String
+  
+  # 5. AI COPILOT RISK ASSESSMENT
+  aiRiskAssessmentReasoning: String
+  
+  # 6. QMS / ICH Q10 ALIGNMENT
+  capaRequired: String
+  suggestedRootCause: String
+  regulatoryReportability: String
+  investigationStatus: String @default(expr: "'Pending Triage'")
+  
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
