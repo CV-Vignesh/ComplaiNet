@@ -13,16 +13,16 @@ load_dotenv()
 
 # Define the structured output matching our Pydantic schema + ICH Q10 fields
 class ComplaintExtraction(BaseModel):
-    complaintSource: Optional[str] = Field(default=None, description="Origin of complaint, e.g. Pharmacy, Hospital, Direct Customer")
+    complaintSource: Optional[str] = Field(default=None, description="Must be exactly one of: 'Direct Customer', 'Hospital/Clinic', 'Pharmacy', or 'Distributor'.")
     customerName: Optional[str] = Field(default=None, description="Name of the person, hospital, pharmacy, or entity making the complaint (e.g. Apollo Pharmacy)")
     productName: Optional[str] = Field(default=None, description="Name of the pharmaceutical product")
     productStrengthGrade: Optional[str] = Field(default=None, description="Strength or grade, e.g., 500 mg")
     batchLotNumber: Optional[str] = Field(default=None, description="Batch or lot number")
-    manufacturingDate: Optional[str] = Field(default=None, description="Date of manufacturing")
-    expiryDate: Optional[str] = Field(default=None, description="Expiry date")
+    manufacturingDate: Optional[str] = Field(default=None, description="Date of manufacturing. Extract EXACTLY as provided (e.g., 'May 2023', '12-05-2023').")
+    expiryDate: Optional[str] = Field(default=None, description="Expiry date. Extract EXACTLY as provided (e.g., 'May 2023', '12-05-2023').")
     quantityAffected: Optional[str] = Field(default=None, description="Quantity affected with unit, e.g., 48 capsules, 50 kg")
     complaintType: Optional[str] = Field(default=None, description="Category of the complaint, e.g., Discoloration, Packaging defect")
-    complaintDate: Optional[str] = Field(default=None, description="Date the complaint was reported")
+    complaintDate: Optional[str] = Field(default=None, description="Date the complaint was reported. Extract EXACTLY as provided.")
     detailedComplaintDescription: Optional[str] = Field(default=None, description="Full description of the issue")
     initialSeverity: Optional[str] = Field(default=None, description="Initial severity: Critical, Major, or Minor")
     priority: Optional[str] = Field(default=None, description="Priority: High, Medium, or Low")
@@ -54,19 +54,20 @@ def create_agent():
         if current_data:
             safe_json = json.dumps(current_data).replace('{', '{{').replace('}', '}}')
             system_prompt = (
-                "You are a Pharma Tech QA AI Assistant with a 100% accuracy requirement. "
+                "You are an Elite Pharma Tech QA AI Assistant. ACCURACY IS ABSOLUTE. "
                 "Your task is to update the existing complaint data based on the user's new instructions. "
-                "You MUST preserve all other existing information exactly as it is. "
-                "CRITICAL: Based on the new updates, you must also use your reasoning to re-evaluate and update "
+                "You MUST preserve all other existing information exactly as it is, word-for-word. "
+                "CRITICAL: Based on the new updates, you must profoundly use your medical reasoning to re-evaluate and update "
                 "the AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles.\n"
                 f"Existing Data: {safe_json}"
             )
         else:
             system_prompt = (
-                "You are a Pharma Tech QA AI Assistant with a 100% accuracy requirement. "
-                "Your task is to extract complaint details from the provided text and structure them according to the schema. "
-                "CRITICAL: You must use your medical/pharma reasoning to evaluate and populate the "
+                "You are an Elite Pharma Tech QA AI Assistant. ACCURACY IS ABSOLUTE. "
+                "Your task is to extract complaint details from the provided text and structure them perfectly according to the schema. "
+                "Do NOT hallucinate data. If a field is not mentioned, leave it null. Extract dates and quantities exactly as written. "
+                "CRITICAL: You must use your medical/pharma reasoning to comprehensively evaluate and populate the "
                 "AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles."
             )

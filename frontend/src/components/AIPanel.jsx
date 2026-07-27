@@ -142,11 +142,11 @@ const AIPanel = () => {
           onClick={() => fileInputRef.current?.click()}
         >
           <UploadCloud size={24} className="dropzone-icon" />
-          <div>Drag & Drop a PDF/DOCX here, or click to browse.</div>
+          <div>Drag & Drop a PDF/DOCX/EML here, or click to browse.</div>
           <input 
             type="file" ref={fileInputRef} style={{ display: 'none' }}
             onChange={(e) => { if(e.target.files?.[0]) handleFileUpload(e.target.files[0]); }}
-            accept=".pdf,.docx,.doc,.txt"
+            accept=".pdf,.docx,.doc,.txt,.eml"
           />
         </div>
 

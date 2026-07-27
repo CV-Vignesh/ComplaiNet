@@ -12,6 +12,16 @@ const ComplaintForm = () => {
     dispatch(updateComplaintField({ field: name, value }));
   };
 
+  const getSeverityStyle = (severity) => {
+    const baseStyle = { backgroundColor: '#e2e8f0' };
+    if (!severity) return baseStyle;
+    const lower = severity.toLowerCase();
+    if (lower.includes('minor')) return { ...baseStyle, color: '#856404', backgroundColor: '#fff3cd', fontWeight: 'bold' };
+    if (lower.includes('major')) return { ...baseStyle, color: '#b95000', backgroundColor: '#ffd8a8', fontWeight: 'bold' };
+    if (lower.includes('critical')) return { ...baseStyle, color: '#721c24', backgroundColor: '#f8d7da', fontWeight: 'bold' };
+    return baseStyle;
+  };
+
   return (
     <form className="form-grid" onSubmit={(e) => e.preventDefault()}>
       
@@ -62,7 +72,7 @@ const ComplaintForm = () => {
       <div className="form-group">
         <label className="form-label">Manufacturing Date</label>
         <input 
-          type="date" name="manufacturingDate" className="form-input"
+          type="text" name="manufacturingDate" className="form-input"
           value={formData.manufacturingDate || ''} onChange={handleChange}
         />
       </div>
@@ -70,7 +80,7 @@ const ComplaintForm = () => {
       <div className="form-group">
         <label className="form-label">Expiry Date</label>
         <input 
-          type="date" name="expiryDate" className="form-input"
+          type="text" name="expiryDate" className="form-input"
           value={formData.expiryDate || ''} onChange={handleChange}
         />
       </div>
@@ -103,7 +113,7 @@ const ComplaintForm = () => {
             <label className="form-label">Initial Severity</label>
             <input 
               type="text" name="initialSeverity" className="form-input"
-              value={formData.initialSeverity || ''} readOnly style={{backgroundColor: '#e2e8f0'}}
+              value={formData.initialSeverity || ''} readOnly style={getSeverityStyle(formData.initialSeverity)}
             />
           </div>
           
