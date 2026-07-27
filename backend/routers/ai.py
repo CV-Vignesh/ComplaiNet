@@ -19,7 +19,10 @@ def api_process_prompt(
     try:
         data_dict = json.loads(current_data) if current_data else None
         result = process_prompt(prompt, data_dict)
-        return result
+        return {
+            "ai_message": result["reply"],
+            "extracted_data": result["data"]
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -49,7 +52,10 @@ def api_process_document(
         data_dict = json.loads(current_data) if current_data else None
         
         result = process_prompt(prompt, data_dict)
-        return result
+        return {
+            "ai_message": result["reply"],
+            "extracted_data": result["data"]
+        }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

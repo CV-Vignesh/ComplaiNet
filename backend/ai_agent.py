@@ -14,7 +14,7 @@ load_dotenv()
 # Define the structured output matching our Pydantic schema + ICH Q10 fields
 class ComplaintExtraction(BaseModel):
     complaintSource: Optional[str] = Field(default=None, description="Origin of complaint, e.g. Pharmacy, Hospital, Direct Customer")
-    customerName: Optional[str] = Field(default=None, description="Name of the person or entity making the complaint")
+    customerName: Optional[str] = Field(default=None, description="Name of the person, hospital, pharmacy, or entity making the complaint (e.g. Apollo Pharmacy)")
     productName: Optional[str] = Field(default=None, description="Name of the pharmaceutical product")
     productStrengthGrade: Optional[str] = Field(default=None, description="Strength or grade, e.g., 500 mg")
     batchLotNumber: Optional[str] = Field(default=None, description="Batch or lot number")
@@ -52,16 +52,23 @@ def create_agent():
         
         # If there is existing data, we are editing. Otherwise, we are creating.
         if current_data:
+            safe_json = json.dumps(current_data).replace('{', '{{').replace('}', '}}')
             system_prompt = (
-                "You are a Pharma Tech QA AI Assistant. Your task is to update the existing complaint data "
-                "based on the user's new instructions. Preserve all other information.\n"
-                f"Existing Data: {json.dumps(current_data)}"
+                "You are a Pharma Tech QA AI Assistant with a 100% accuracy requirement. "
+                "Your task is to update the existing complaint data based on the user's new instructions. "
+                "You MUST preserve all other existing information exactly as it is. "
+                "CRITICAL: Based on the new updates, you must also use your reasoning to re-evaluate and update "
+                "the AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
+                "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles.\n"
+                f"Existing Data: {safe_json}"
             )
         else:
             system_prompt = (
-                "You are a Pharma Tech QA AI Assistant. Your task is to extract complaint details "
-                "from the provided text and structure them according to the schema. "
-                "Ensure you apply ICH Q10 principles for CAPA, root cause, and regulatory reportability."
+                "You are a Pharma Tech QA AI Assistant with a 100% accuracy requirement. "
+                "Your task is to extract complaint details from the provided text and structure them according to the schema. "
+                "CRITICAL: You must use your medical/pharma reasoning to evaluate and populate the "
+                "AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
+                "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles."
             )
         
         prompt = ChatPromptTemplate.from_messages([
