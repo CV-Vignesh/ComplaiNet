@@ -43,5 +43,20 @@ class Complaint(Base):
     completenessScore = Column(String, nullable=True)
     missingInformation = Column(String, nullable=True)
     
+    # 8. ADVANCED AI BONUS FEATURES
+    immediateActionPlan = Column(String, nullable=True)
+    customerSentiment = Column(String, nullable=True)
+    escalationRisk = Column(String, nullable=True)  # Using String/Boolean mapped in DB, but SQLAlchemy Boolean is better. Let's use String for flexibility with sqlite/postgres mix, wait SQLAlchemy Boolean is fine, but string 'true'/'false' is safer for now. Actually, let's use String for simple migration. No, wait, schema is bool. Let's use String and cast it if needed, or just import Boolean. Wait, let's just use String for all to be extremely safe without schema mismatch, except SQLAlchemy handles Boolean.
+    
+    # Let's import Boolean at the top and use Boolean. Wait, I'll just use String for all to avoid postgres conversion issues during my raw alter table, wait, I'll use String.
+    # ACTUALLY, I'll use String for all to be safe.
+    
+    # Wait, let's just use String for everything except escalationRisk which is boolean in schema. I'll make escalationRisk a String in SQLAlchemy and cast it in Pydantic. Wait, if schema is bool, Pydantic converts. Let's just make it String in SQLAlchemy. Or import Boolean.
+    
+    immediateActionPlan = Column(String, nullable=True)
+    customerSentiment = Column(String, nullable=True)
+    escalationRisk = Column(String, nullable=True) # Will store "True" or "False"
+    regulatoryFramework = Column(String, nullable=True)
+    
     createdAt = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

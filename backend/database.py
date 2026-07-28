@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # We are setting up SQLAlchemy so our Python backend (LangGraph) can talk to 
-# the PostgreSQL instance that Firebase Data Connect provisions.
-# If no Postgres URL is provided, fallback to local sqlite for development.
+# Incase of any postgres server or connection issues, fallback to local sqlite for development.
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./complaints.db")
 
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):

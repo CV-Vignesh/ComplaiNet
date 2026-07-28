@@ -34,6 +34,12 @@ class ComplaintExtraction(BaseModel):
     complaintSummary: Optional[str] = Field(default=None, description="A 1-sentence TLDR summary of the complaint.")
     completenessScore: Optional[str] = Field(default=None, description="A percentage score (0-100%) indicating how complete the complaint details are. 100% means all product, batch, date, and defect info is present.")
     missingInformation: Optional[str] = Field(default=None, description="A comma-separated list of critical missing fields (e.g., 'Batch Number, Expiry Date'). If 100% complete, leave null.")
+    
+    # NEW ADVANCED AI FEATURES
+    immediateActionPlan: Optional[str] = Field(default=None, description="A strict, 3-step immediate action plan for the QA team (e.g., '1. Quarantine stock. 2. Notify regulatory. 3. Investigate root cause.').")
+    customerSentiment: Optional[str] = Field(default=None, description="The emotional tone of the complaint (e.g., 'Highly Litigious', 'Distressed', 'Neutral').")
+    escalationRisk: Optional[str] = Field(default=None, description="Return 'Yes' if the customer is threatening a lawsuit, going to the press, or if it's a critical safety issue. Otherwise 'No'.")
+    regulatoryFramework: Optional[str] = Field(default=None, description="Predict which specific FDA/EMA regulatory framework or form is triggered (e.g., 'FDA MedWatch Form 3500A', '21 CFR Part 211').")
 
 class AgentState(TypedDict):
     messages: list[BaseMessage]
@@ -64,6 +70,7 @@ def create_agent():
                 "the AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles.\n"
                 "Also, recalculate the completenessScore and missingInformation based on the updated data.\n"
+                "NEW: You must generate a 3-step immediateActionPlan for QA triage. Analyze customerSentiment and flag escalationRisk ('Yes' or 'No'). Predict the exact FDA/EMA regulatoryFramework triggered by this issue.\n"
                 f"Existing Data: {safe_json}"
             )
         else:
@@ -75,7 +82,8 @@ def create_agent():
                 "CRITICAL: You must use your medical/pharma reasoning to comprehensively evaluate and populate the "
                 "AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles. "
-                "Additionally, provide a 1-sentence complaintSummary, assign a completenessScore (0-100%), and list any critical missingInformation."
+                "Additionally, provide a 1-sentence complaintSummary, assign a completenessScore (0-100%), and list any critical missingInformation. "
+                "NEW ADVANCED FEATURES: You must generate a 3-step immediateActionPlan for QA triage. Analyze the text for customerSentiment (e.g. Litigious, Distressed) and flag escalationRisk ('Yes' or 'No'). Finally, predict the exact FDA/EMA regulatoryFramework triggered by this complaint."
             )
         
         prompt = ChatPromptTemplate.from_messages([

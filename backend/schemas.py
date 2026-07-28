@@ -24,6 +24,12 @@ class ComplaintBase(BaseModel):
     complaintSummary: Optional[str] = None
     completenessScore: Optional[str] = None
     missingInformation: Optional[str] = None
+    
+    # NEW ADVANCED AI BONUS FEATURES
+    immediateActionPlan: Optional[str] = None
+    customerSentiment: Optional[str] = None
+    escalationRisk: Optional[str] = None
+    regulatoryFramework: Optional[str] = None
 
 class ComplaintCreate(ComplaintBase):
     pass

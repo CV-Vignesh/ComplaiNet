@@ -188,6 +188,14 @@ const ComplaintForm = () => {
           </div>
 
           <div className="form-group">
+            <label className="form-label">Regulatory Framework</label>
+            <input 
+              type="text" name="regulatoryFramework" className="form-input"
+              value={formData.regulatoryFramework || ''} readOnly style={{backgroundColor: '#e2e8f0', fontWeight: 'bold'}}
+            />
+          </div>
+
+          <div className="form-group">
             <label className="form-label">CAPA Required?</label>
             <input 
               type="text" name="capaRequired" className="form-input"
@@ -208,6 +216,35 @@ const ComplaintForm = () => {
             <textarea 
               name="aiRiskAssessmentReasoning" className="form-textarea"
               value={formData.aiRiskAssessmentReasoning || ''} readOnly style={{backgroundColor: '#e2e8f0', minHeight: '60px'}}
+            />
+          </div>
+
+          <div className="form-group full-width">
+            <label className="form-label" style={{color: '#0f766e'}}>Immediate QA Action Plan (Triage)</label>
+            <textarea 
+              name="immediateActionPlan" className="form-textarea"
+              value={formData.immediateActionPlan || ''} readOnly style={{backgroundColor: '#f0fdfa', border: '1px solid #14b8a6', color: '#0f766e', minHeight: '60px', fontWeight: '500'}}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Customer Sentiment</label>
+            <input 
+              type="text" name="customerSentiment" className="form-input"
+              value={formData.customerSentiment || ''} readOnly style={{backgroundColor: '#e2e8f0'}}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Legal / Escalation Risk</label>
+            <input 
+              type="text" name="escalationRisk" className="form-input"
+              value={formData.escalationRisk || ''} readOnly style={{
+                backgroundColor: formData.escalationRisk === 'Yes' ? '#fee2e2' : '#e2e8f0',
+                color: formData.escalationRisk === 'Yes' ? '#991b1b' : 'inherit',
+                fontWeight: formData.escalationRisk === 'Yes' ? 'bold' : 'normal',
+                border: formData.escalationRisk === 'Yes' ? '1px solid #f87171' : '1px solid #cbd5e1'
+              }}
             />
           </div>
         </div>
