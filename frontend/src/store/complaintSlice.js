@@ -21,6 +21,7 @@ const initialState = {
     regulatoryReportability: '',
     investigationStatus: 'Pending Triage'
   },
+  isDuplicate: false,
   status: 'idle',
   error: null
 };
@@ -36,11 +37,16 @@ export const complaintSlice = createSlice({
     updateEntireComplaint: (state, action) => {
       state.data = { ...state.data, ...action.payload };
     },
+    setComplaintData: (state, action) => {
+      state.data = action.payload.data;
+      state.isDuplicate = action.payload.isDuplicate || false;
+    },
     resetComplaint: (state) => {
       state.data = initialState.data;
+      state.isDuplicate = false;
     }
   }
 });
 
-export const { updateComplaintField, updateEntireComplaint, resetComplaint } = complaintSlice.actions;
+export const { updateComplaintField, updateEntireComplaint, setComplaintData, resetComplaint } = complaintSlice.actions;
 export default complaintSlice.reducer;

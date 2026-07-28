@@ -21,3 +21,8 @@ export const aiProcessDocument = async (file, currentData) => {
   const response = await axios.post(`${API_URL}/ai/process_document`, formData);
   return response.data;
 };
+
+export const saveComplaint = async (complaintData) => {
+  const response = await axios.post(`${API_URL}/complaints/`, complaintData);
+  return response.data;
+};

@@ -38,5 +38,10 @@ class Complaint(Base):
     regulatoryReportability = Column(String, nullable=True)
     investigationStatus = Column(String, nullable=True, default="Pending Triage")
     
+    # 7. BONUS FEATURES
+    complaintSummary = Column(String, nullable=True)
+    completenessScore = Column(String, nullable=True)
+    missingInformation = Column(String, nullable=True)
+    
     createdAt = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

@@ -1,15 +1,33 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateComplaintField } from '../store/complaintSlice';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Save, CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import { saveComplaint } from '../services/api';
 
 const ComplaintForm = () => {
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.complaint.data);
+  const isDuplicate = useSelector((state) => state.complaint.isDuplicate);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [saveSuccess, setSaveSuccess] = React.useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     dispatch(updateComplaintField({ field: name, value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await saveComplaint(formData);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error("Error saving complaint:", error);
+      alert("Failed to save complaint. See console.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getSeverityStyle = (severity) => {
@@ -25,6 +43,42 @@ const ComplaintForm = () => {
   return (
     <form className="form-grid" onSubmit={(e) => e.preventDefault()}>
       
+      {isDuplicate && (
+        <div className="form-group full-width" style={{ 
+          backgroundColor: '#fffbeb', border: '1px solid #fef3c7', 
+          borderLeft: '4px solid #f59e0b', padding: '1rem', 
+          borderRadius: '4px', display: 'flex', gap: '0.5rem', alignItems: 'center', color: '#b45309',
+          fontWeight: 'bold'
+        }}>
+          <AlertTriangle size={20} />
+          ⚠️ Potential Duplicate Detected: A complaint for this Product and Batch Number already exists in the database!
+        </div>
+      )}
+
+      {/* Bonus Feature: Complaint Summary */}
+      {formData.complaintSummary && (
+        <div className="form-group full-width" style={{ backgroundColor: '#f0fdf4', padding: '1rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+          <label className="form-label" style={{ color: '#166534', fontWeight: 'bold' }}>Complaint Summary (AI Generated)</label>
+          <div style={{ color: '#15803d', fontSize: '0.95rem', marginTop: '0.25rem' }}>{formData.complaintSummary}</div>
+        </div>
+      )}
+
+      {/* Bonus Feature: Completeness Checker */}
+      {formData.completenessScore && (
+        <div className="form-group full-width" style={{ backgroundColor: '#eff6ff', padding: '1rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <label className="form-label" style={{ color: '#1e40af', fontWeight: 'bold' }}>Completeness Score</label>
+            <span style={{ fontWeight: 'bold', color: '#1d4ed8' }}>{formData.completenessScore}</span>
+          </div>
+          {formData.missingInformation && (
+            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', color: '#b91c1c', fontSize: '0.85rem', alignItems: 'center', backgroundColor: '#fef2f2', padding: '0.5rem', borderRadius: '4px' }}>
+              <AlertCircle size={16} />
+              <strong>Missing Info:</strong> {formData.missingInformation}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="form-group">
         <label className="form-label">Customer / Source Name</label>
         <input 
@@ -93,6 +147,14 @@ const ComplaintForm = () => {
         />
       </div>
 
+      <div className="form-group">
+        <label className="form-label">Complaint Date</label>
+        <input 
+          type="text" name="complaintDate" className="form-input"
+          value={formData.complaintDate || ''} onChange={handleChange}
+        />
+      </div>
+
       <div className="form-group full-width">
         <label className="form-label">Detailed Description</label>
         <textarea 
@@ -149,6 +211,23 @@ const ComplaintForm = () => {
             />
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <button 
+          onClick={handleSave} 
+          disabled={isSaving || saveSuccess}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.75rem 1.5rem', borderRadius: '8px',
+            backgroundColor: saveSuccess ? '#00897b' : '#0d47a1', color: 'white',
+            border: 'none', cursor: (isSaving || saveSuccess) ? 'not-allowed' : 'pointer',
+            fontWeight: '600', transition: 'all 0.3s ease'
+          }}
+        >
+          {saveSuccess ? <CheckCircle size={20} /> : <Save size={20} />}
+          {isSaving ? 'Saving...' : saveSuccess ? 'Saved Successfully!' : 'Save Complaint'}
+        </button>
       </div>
     </form>
   );

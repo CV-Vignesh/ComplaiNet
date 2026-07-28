@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addMessage, setProcessing } from '../store/chatSlice';
-import { updateEntireComplaint } from '../store/complaintSlice';
+import { updateEntireComplaint, setComplaintData } from '../store/complaintSlice';
 import { aiProcessPrompt, aiProcessDocument } from '../services/api';
 import { Send, UploadCloud, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -42,7 +42,7 @@ const AIPanel = () => {
       
       // Update form if AI extracted data
       if (response.extracted_data) {
-        dispatch(updateEntireComplaint(response.extracted_data));
+        dispatch(setComplaintData({ data: response.extracted_data, isDuplicate: response.is_duplicate }));
       }
       
       // Add AI response to UI
@@ -81,7 +81,7 @@ const AIPanel = () => {
       const response = await aiProcessDocument(file, currentFormData);
       
       if (response.extracted_data) {
-        dispatch(updateEntireComplaint(response.extracted_data));
+        dispatch(setComplaintData({ data: response.extracted_data, isDuplicate: response.is_duplicate }));
       }
       
       dispatch(addMessage({

@@ -14,7 +14,7 @@ load_dotenv()
 # Define the structured output matching our Pydantic schema + ICH Q10 fields
 class ComplaintExtraction(BaseModel):
     complaintSource: Optional[str] = Field(default=None, description="Must be exactly one of: 'Direct Customer', 'Hospital/Clinic', 'Pharmacy', or 'Distributor'.")
-    customerName: Optional[str] = Field(default=None, description="Name of the person, hospital, pharmacy, or entity making the complaint (e.g. Apollo Pharmacy)")
+    customerName: Optional[str] = Field(default=None, description="Name of the person, hospital, pharmacy, or entity making the complaint. DO NOT auto-populate this from the complaint source. Only fill this if a specific name is explicitly provided in the text.")
     productName: Optional[str] = Field(default=None, description="Name of the pharmaceutical product")
     productStrengthGrade: Optional[str] = Field(default=None, description="Strength or grade, e.g., 500 mg")
     batchLotNumber: Optional[str] = Field(default=None, description="Batch or lot number")
@@ -31,6 +31,9 @@ class ComplaintExtraction(BaseModel):
     suggestedRootCause: Optional[str] = Field(default=None, description="AI suggested likely root cause, e.g., Manufacturing, Storage, Packaging")
     regulatoryReportability: Optional[str] = Field(default=None, description="High, Low, or None. E.g., High for adverse events or contamination")
     investigationStatus: Optional[str] = Field(default="Pending Triage")
+    complaintSummary: Optional[str] = Field(default=None, description="A 1-sentence TLDR summary of the complaint.")
+    completenessScore: Optional[str] = Field(default=None, description="A percentage score (0-100%) indicating how complete the complaint details are. 100% means all product, batch, date, and defect info is present.")
+    missingInformation: Optional[str] = Field(default=None, description="A comma-separated list of critical missing fields (e.g., 'Batch Number, Expiry Date'). If 100% complete, leave null.")
 
 class AgentState(TypedDict):
     messages: list[BaseMessage]
@@ -60,6 +63,7 @@ def create_agent():
                 "CRITICAL: Based on the new updates, you must profoundly use your medical reasoning to re-evaluate and update "
                 "the AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles.\n"
+                "Also, recalculate the completenessScore and missingInformation based on the updated data.\n"
                 f"Existing Data: {safe_json}"
             )
         else:
@@ -67,9 +71,11 @@ def create_agent():
                 "You are an Elite Pharma Tech QA AI Assistant. ACCURACY IS ABSOLUTE. "
                 "Your task is to extract complaint details from the provided text and structure them perfectly according to the schema. "
                 "Do NOT hallucinate data. If a field is not mentioned, leave it null. Extract dates and quantities exactly as written. "
+                "CRITICAL INSTRUCTION: Do NOT auto-populate the Customer/Source Name simply based on the Complaint Source. Only populate Customer/Source Name if a specific entity name is explicitly provided.\n"
                 "CRITICAL: You must use your medical/pharma reasoning to comprehensively evaluate and populate the "
                 "AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
-                "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles."
+                "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles. "
+                "Additionally, provide a 1-sentence complaintSummary, assign a completenessScore (0-100%), and list any critical missingInformation."
             )
         
         prompt = ChatPromptTemplate.from_messages([

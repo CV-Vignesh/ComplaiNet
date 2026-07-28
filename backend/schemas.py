@@ -21,6 +21,9 @@ class ComplaintBase(BaseModel):
     suggestedRootCause: Optional[str] = None
     regulatoryReportability: Optional[str] = None
     investigationStatus: Optional[str] = "Pending Triage"
+    complaintSummary: Optional[str] = None
+    completenessScore: Optional[str] = None
+    missingInformation: Optional[str] = None
 
 class ComplaintCreate(ComplaintBase):
     pass
