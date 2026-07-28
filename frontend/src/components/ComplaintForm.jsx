@@ -11,6 +11,35 @@ const ComplaintForm = () => {
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveSuccess, setSaveSuccess] = React.useState(false);
 
+  // Deterministic Completeness Calculation
+  const criticalFields = [
+    { key: 'customerName', label: 'Customer Name' },
+    { key: 'productName', label: 'Product Name' },
+    { key: 'productStrengthGrade', label: 'Strength / Grade' },
+    { key: 'batchLotNumber', label: 'Batch / Lot Number' },
+    { key: 'manufacturingDate', label: 'Manufacturing Date' },
+    { key: 'expiryDate', label: 'Expiry Date' },
+    { key: 'quantityAffected', label: 'Quantity Affected' },
+    { key: 'complaintDate', label: 'Complaint Date' },
+    { key: 'detailedComplaintDescription', label: 'Detailed Description' }
+  ];
+
+  const calculateCompleteness = () => {
+    let missing = [];
+    criticalFields.forEach(f => {
+      if (!formData[f.key] || typeof formData[f.key] !== 'string' || formData[f.key].trim() === '') {
+        missing.push(f.label);
+      }
+    });
+    const score = Math.round(((criticalFields.length - missing.length) / criticalFields.length) * 100);
+    return {
+      score: `${score}%`,
+      missingText: missing.length > 0 ? missing.join(', ') : null
+    };
+  };
+
+  const { score: derivedScore, missingText: derivedMissing } = calculateCompleteness();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     dispatch(updateComplaintField({ field: name, value }));
@@ -19,7 +48,12 @@ const ComplaintForm = () => {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      await saveComplaint(formData);
+      const dataToSave = {
+        ...formData,
+        completenessScore: derivedScore,
+        missingInformation: derivedMissing
+      };
+      await saveComplaint(dataToSave);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
@@ -63,21 +97,19 @@ const ComplaintForm = () => {
         </div>
       )}
 
-      {/* Bonus Feature: Completeness Checker */}
-      {formData.completenessScore && (
-        <div className="form-group full-width" style={{ backgroundColor: '#eff6ff', padding: '1rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <label className="form-label" style={{ color: '#1e40af', fontWeight: 'bold' }}>Completeness Score</label>
-            <span style={{ fontWeight: 'bold', color: '#1d4ed8' }}>{formData.completenessScore}</span>
-          </div>
-          {formData.missingInformation && (
-            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', color: '#b91c1c', fontSize: '0.85rem', alignItems: 'center', backgroundColor: '#fef2f2', padding: '0.5rem', borderRadius: '4px' }}>
-              <AlertCircle size={16} />
-              <strong>Missing Info:</strong> {formData.missingInformation}
-            </div>
-          )}
+      {/* Feature: Deterministic Completeness Checker */}
+      <div className="form-group full-width" style={{ backgroundColor: '#eff6ff', padding: '1rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label className="form-label" style={{ color: '#1e40af', fontWeight: 'bold' }}>Completeness Score</label>
+          <span style={{ fontWeight: 'bold', color: derivedScore === '100%' ? '#15803d' : '#1d4ed8' }}>{derivedScore}</span>
         </div>
-      )}
+        {derivedMissing && (
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', color: '#b91c1c', fontSize: '0.85rem', alignItems: 'center', backgroundColor: '#fef2f2', padding: '0.5rem', borderRadius: '4px' }}>
+            <AlertCircle size={16} />
+            <strong>Missing Info:</strong> {derivedMissing}
+          </div>
+        )}
+      </div>
 
       <div className="form-group">
         <label className="form-label">Customer / Source Name</label>

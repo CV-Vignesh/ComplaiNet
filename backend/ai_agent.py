@@ -69,7 +69,6 @@ def create_agent():
                 "CRITICAL: Based on the new updates, you must profoundly use your medical reasoning to re-evaluate and update "
                 "the AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles.\n"
-                "Also, recalculate the completenessScore and missingInformation based on the updated data.\n"
                 "NEW: You must generate a 3-step immediateActionPlan for QA triage. Analyze customerSentiment and flag escalationRisk ('Yes' or 'No'). Predict the exact FDA/EMA regulatoryFramework triggered by this issue.\n"
                 f"Existing Data: {safe_json}"
             )
@@ -82,7 +81,7 @@ def create_agent():
                 "CRITICAL: You must use your medical/pharma reasoning to comprehensively evaluate and populate the "
                 "AI Copilot Risk Assessment Section (initialSeverity, priority, aiRiskAssessmentReasoning, "
                 "capaRequired, suggestedRootCause, regulatoryReportability) applying ICH Q10 principles. "
-                "Additionally, provide a 1-sentence complaintSummary, assign a completenessScore (0-100%), and list any critical missingInformation. "
+                "Additionally, provide a 1-sentence complaintSummary. "
                 "NEW ADVANCED FEATURES: You must generate a 3-step immediateActionPlan for QA triage. Analyze the text for customerSentiment (e.g. Litigious, Distressed) and flag escalationRisk ('Yes' or 'No'). Finally, predict the exact FDA/EMA regulatoryFramework triggered by this complaint."
             )
         
